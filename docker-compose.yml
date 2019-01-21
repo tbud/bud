@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  studio:
+    image: tbud/studio
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - http_proxy=http://squid:3128
+      network: backend
+    container_name: bud_studio
+    networks:
+      backend:
+    ports:
+      - "8001:8080"
+    volumes:
+      - $GOPATH:/go
+      - $PWD:/app
+    tty: true
+    command: /bin/sh
+
+  studio_node:
+    image: node:11-alpine
+    container_name: bud_studio_node
+    networks:
+      backend:
+    ports:
+      - "80:8080"
+    volumes:
+      - $PWD:/app
+    tty: true
+    command: /bin/sh
+
+  studio_swaggerapi:
+    image: swaggerapi/swagger-editor
+    container_name: bud_studio_swaggerapi
+    networks:
+      backend:
+    ports:
+      - "8080:8080"
+
+networks:
+  backend:
+    name: backend
